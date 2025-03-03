@@ -128,9 +128,3 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-
-# Seeders
-database/seeders/*users-seeder*
-database/seeders/*roles-seeder*
-database/seeders_data/*user_data*
-database/seeders_data/*role_data*
