@@ -31,18 +31,33 @@ const login = async (identifier, password) => {
 };
 
 const register = async (userData) => {
-    const { employee_id, email, password, fullname, phone, address, profile_picture, department, role_type_id } = userData;
-
-    const existingUser = await db.Users.findOne({
-        where: {
-            [db.Sequelize.Op.or]: [{ employee_id }, { email }]
-        }
-    });
-
-    if (existingUser) throw new Error("Employee ID or Email already exists");
+    const { email, password, fullname, phone, address, profile_picture, department, role_type_id } = userData;
 
     const roleType = await db.RoleTypes.findByPk(role_type_id);
     if (!roleType) throw new Error("Invalid Role");
+
+    const existingEmail = await db.Users.findOne({ where: { email } });
+    if (existingEmail) throw new Error("Employee already exists");
+
+    let employee_id = "";
+    let isUnique = false;
+
+    while (!isUnique) {
+        if (role_type_id === 1) {
+            let deptInitials = department.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 3);
+            if (deptInitials.length === 2) deptInitials += "D";
+
+            const randomDigits = Math.floor(100000 + Math.random() * 900000);
+            employee_id = `${deptInitials}${randomDigits}`;
+        } else if (role_type_id === 2) {
+            const randomDigits = Math.floor(1000 + Math.random() * 9000);
+            employee_id = `ADMIN${randomDigits}`;
+        } else {
+            throw new Error("Invalid Role");
+        }
+
+        isUnique = !(await db.Users.findOne({ where: { employee_id } }));
+    }
 
     const hashedPassword = await bcrypt.hash(password, bcrypt.genSaltSync(10));
 
@@ -64,7 +79,6 @@ const register = async (userData) => {
 
     return { info: "Registration successful" };
 };
-
 
 module.exports = {
     login,
