@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 const router = require("./src/routes/router");
 const { dbConnect } = require("./database/config/database")
 const PORT = process.env.APP_PORT || 4000;
-
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin) {
