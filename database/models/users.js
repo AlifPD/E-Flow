@@ -51,6 +51,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
+    profile_thumbnail: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
     department: {
       type: DataTypes.STRING,
       allowNull: false
@@ -60,7 +64,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'Users',
     tableName: 'Users',
     freezeTableName: true,
-    paranoid: true,
     timestamps: true
   });
   return Users;

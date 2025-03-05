@@ -1,10 +1,11 @@
 require('dotenv').config({ path: `${process.cwd()}/.env` });
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require('cookie-parser');
+
 const router = require("./src/routes/router");
 const { dbConnect } = require("./database/config/database")
 const PORT = process.env.APP_PORT || 4000;
-
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin) {
@@ -19,6 +20,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors(corsOptions))
+app.use(cookieParser())
 
 dbConnect(5).then(() => {
     if (process.env.NODE_ENV == 'production') {
