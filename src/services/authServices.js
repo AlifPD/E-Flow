@@ -96,13 +96,13 @@ const login = async (identifier, password) => {
 
     let profile_picture = ""
     let profile_thumbnail = ""
-    if(user.profile_picture){
+    if (user.profile_picture) {
         profile_picture = await getSignedUrl(s3Client, new GetObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME,
             Key: user.profile_picture
         }), { expiresIn: 2 * 24 * 60 * 60 })
     }
-    if(user.profile_thumbnail){
+    if (user.profile_thumbnail) {
         profile_thumbnail = await getSignedUrl(s3Client, new GetObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME,
             Key: user.profile_thumbnail
@@ -110,7 +110,7 @@ const login = async (identifier, password) => {
     }
 
     const userRoles = user.Roles.map(role => role.RoleType.role_name);
-    const { employee_id, fullname, department } = user
+    const { employee_id, fullname, department, email, phone, address } = user
     const token = jwt.sign(
         {
             user_id: user.id,
@@ -130,6 +130,9 @@ const login = async (identifier, password) => {
             department,
             profile_picture,
             profile_thumbnail,
+            email,
+            phone,
+            address,
             roles: userRoles
         }
     };
