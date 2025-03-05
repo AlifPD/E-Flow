@@ -3,7 +3,7 @@ const authService = require("../services/authServices");
 const login = async (req, res) => {
     try {
         const { identifier, password } = req.body;
-        const { token, userInfo } = await authService.login(identifier, password);
+        const { token, userInfo, tokenStorage } = await authService.login(identifier, password);
 
         res.cookie("token", token, {
             httpOnly: true,
@@ -11,7 +11,7 @@ const login = async (req, res) => {
         });
         res.json({
             info: "Success login",
-            data: userInfo
+            data: { ...userInfo, tokenStorage }
         });
     } catch (error) {
         res.status(500).json({ info: error.message });
@@ -27,7 +27,18 @@ const register = async (req, res) => {
     }
 };
 
+const logout = (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+    });
+    return res.json({ info: "Logged out successfully" });
+};
+
+
 module.exports = {
     login,
-    register
+    register,
+    logout
 }

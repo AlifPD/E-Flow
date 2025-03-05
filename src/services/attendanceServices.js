@@ -1,5 +1,6 @@
 const { PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const dayjs = require("dayjs");
 const db = require("../../database/models");
 const Op = db.Sequelize.Op;
 const { s3Client } = require("../utils/utils")
@@ -75,8 +76,10 @@ const getLatestAttendance = async (user_id) => {
 
 const getAttendanceList = async (userInfo, employee_id, isAdminView, start_time, end_time, page = 1, limit = 15) => {
     const offset = (page - 1) * limit;
-    const startDate = start_time ? new Date(start_time) : new Date(new Date().setDate(new Date().getDate() - 7));
-    const endDate = end_time ? new Date(end_time) : new Date(new Date().setHours(23, 59, 59, 999));
+    const startDate = start_time ? `${start_time} 00:00:00` : dayjs().subtract(7, "days").format("YYYY-MM-DD 00:00:00");
+    const endDate = end_time ? `${end_time} 23:59:59` : dayjs().format("YYYY-MM-DD 23:59:59");
+
+    console.log(startDate, endDate)
 
     const whereCondition = {
         [Op.or]: [
@@ -98,7 +101,7 @@ const getAttendanceList = async (userInfo, employee_id, isAdminView, start_time,
     } else {
         if (userInfo.roles.includes('ADMIN')) {
             if (employee_id) {
-                whereCondition.user_id = employee_id;
+                whereCondition["$User.employee_id$"] = employee_id;
             }
         } else {
             whereCondition.user_id = userInfo.id;
@@ -109,7 +112,11 @@ const getAttendanceList = async (userInfo, employee_id, isAdminView, start_time,
         where: whereCondition,
         limit: parseInt(limit),
         offset: parseInt(offset),
-        include: { model: db.Users, attributes: ["employee_id", "fullname"] },
+        include: {
+            model: db.Users,
+            attributes: ["employee_id", "fullname"],
+            required: true
+        },
         order: [["createdAt", "DESC"]]
     });
 

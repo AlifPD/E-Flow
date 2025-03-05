@@ -9,5 +9,6 @@ const upload = multer({ storage: storage })
 
 router.post("/login", authController.login);
 router.post("/register", authJWT("ADMIN"), upload.single('profile_picture'), authController.register);
+router.post("/logout", authController.logout);
 
 module.exports = router;

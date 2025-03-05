@@ -122,8 +122,20 @@ const login = async (identifier, password) => {
         }
     );
 
+    const tokenStorage = jwt.sign(
+        {
+            employee_id: user.employee_id,
+            roles: userRoles
+        },
+        process.env.JWT_SECRET_KEY,
+        {
+            expiresIn: process.env.JWT_EXPIRES
+        }
+    );
+
     return {
         token,
+        tokenStorage,
         userInfo: {
             employee_id,
             fullname,
