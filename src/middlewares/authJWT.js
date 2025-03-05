@@ -19,7 +19,7 @@ const authJWT = (...allowedRoles) => {
             })
 
             if (!user) {
-                return res.status(401).json({ info: "Unauthorized" })
+                return res.status(400).json({ info: "User do not exist" })
             }
 
             req.user = user

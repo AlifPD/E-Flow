@@ -14,7 +14,7 @@ const login = async (req, res) => {
             data: userInfo
         });
     } catch (error) {
-        res.status(401).json({ info: error.message });
+        res.status(500).json({ info: error.message });
     }
 };
 
