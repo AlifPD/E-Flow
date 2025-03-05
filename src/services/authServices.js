@@ -2,10 +2,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { PutObjectCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
-const sharp = require("sharp")
+const sharp = require("sharp");
 
 const db = require("../../database/models");
-const { s3Client } = require("../utils/utils")
+const { s3Client } = require("../utils/utils");
 
 const register = async (userData, profilePicture) => {
     const { email, password, fullname, phone, address, department } = userData;
@@ -43,7 +43,6 @@ const register = async (userData, profilePicture) => {
     const thumbnailBuffer = await sharp(profilePicture.buffer).resize({ height: 25, width: 25, fit: 'contain' }).toBuffer()
 
     try {
-        console.log(profilePicture)
         await Promise.all([
             s3Client.send(new PutObjectCommand({
                 Bucket: process.env.S3_BUCKET_NAME,
@@ -95,18 +94,20 @@ const login = async (identifier, password) => {
     const isPassCorrect = await bcrypt.compare(password, user.password);
     if (!isPassCorrect) throw new Error("Invalid credentials");
 
-    const [profile_picture, profile_thumbnail] = await Promise.all([
-        getSignedUrl(s3Client, new GetObjectCommand({
+    let profile_picture = ""
+    let profile_thumbnail = ""
+    if(user.profile_picture){
+        profile_picture = await getSignedUrl(s3Client, new GetObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME,
             Key: user.profile_picture
-        }), { expiresIn: 2 * 24 * 60 * 60 }),
-
-        getSignedUrl(s3Client, new GetObjectCommand({
+        }), { expiresIn: 2 * 24 * 60 * 60 })
+    }
+    if(user.profile_thumbnail){
+        profile_thumbnail = await getSignedUrl(s3Client, new GetObjectCommand({
             Bucket: process.env.S3_BUCKET_NAME,
             Key: user.profile_thumbnail
         }), { expiresIn: 2 * 24 * 60 * 60 })
-    ]);
-
+    }
 
     const userRoles = user.Roles.map(role => role.RoleType.role_name);
     const { employee_id, fullname, department } = user

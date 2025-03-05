@@ -1,12 +1,14 @@
 const express = require("express");
-
-const attendanceController = require("../controllers/attendanceController");
+const multer = require('multer');
 const authJWT = require("../middlewares/authJWT");
+const attendanceController = require("../controllers/attendanceController");
 
 const router = express.Router();
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 
 router.get("/latest", authJWT(), attendanceController.getLatestAttendance);
 router.get("/", authJWT(), attendanceController.getAttendanceList);
-router.post("/", authJWT(), attendanceController.createAttendance);
+router.post("/", authJWT(), upload.single('evidence'), attendanceController.createAttendance);
 
 module.exports = router

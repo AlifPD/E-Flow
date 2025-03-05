@@ -20,7 +20,7 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
     try {
-        await authService.register(req.body);
+        await authService.register(req.body, req.file);
         res.status(201).json({ info: "User registered successfully" });
     } catch (error) {
         res.status(400).json({ info: error.message });

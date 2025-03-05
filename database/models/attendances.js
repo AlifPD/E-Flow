@@ -24,7 +24,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull: false
     },
-    evidence: {
+    evidence_clock_in: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    evidence_clock_out: {
       type: DataTypes.STRING,
       allowNull: true
     },
